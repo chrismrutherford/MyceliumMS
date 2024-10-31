@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ 'Edit' if experiment else 'New' }} Experiment</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Basic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form.title.label(class="form-label") }}
+                    {{ form.title(class="form-control") }}
+                    {% if form.title.errors %}
+                        {% for error in form.title.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.medium_id.label(class="form-label") }}
+                    {{ form.medium_id(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.vessel_id.label(class="form-label") }}
+                    {{ form.vessel_id(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.substrate_composition.label(class="form-label") }}
+                    {{ form.substrate_composition(class="form-control") }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Inoculation Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form.inoculation_method.label(class="form-label") }}
+                    {{ form.inoculation_method(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.inoculation_source_type.label(class="form-label") }}
+                    {{ form.inoculation_source_type(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.inoculation_date.label(class="form-label") }}
+                    {{ form.inoculation_date(class="form-control", type="datetime-local") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.geographic_origin.label(class="form-label") }}
+                    {{ form.geographic_origin(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.supplier_info.label(class="form-label") }}
+                    {{ form.supplier_info(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.strain_info.label(class="form-label") }}
+                    {{ form.strain_info(class="form-control") }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Environmental Conditions</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form.temperature.label(class="form-label") }}
+                    {{ form.temperature(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.humidity.label(class="form-label") }}
+                    {{ form.humidity(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.light_exposure.label(class="form-label") }}
+                    {{ form.light_exposure(class="form-control") }}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('experiments.list_experiments') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

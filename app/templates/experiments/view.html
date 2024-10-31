@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ experiment.title }}</h1>
+        <div>
+            <a href="{{ url_for('experiments.add_entry', id=experiment.id) }}" class="btn btn-primary">Add Entry</a>
+            <a href="{{ url_for('experiments.manage_experiment', id=experiment.id) }}" class="btn btn-secondary">Edit Experiment</a>
+            {% if experiment.status == 'active' %}
+                <form method="POST" style="display: inline;">
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="end_experiment" value="1">
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to end this experiment?')">End Experiment</button>
+                </form>
+            {% endif %}
+            <a href="{{ url_for('experiments.list_experiments') }}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Experiment Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Status:</strong> {{ experiment.status }}</p>
+                    <p><strong>Started:</strong> {{ experiment.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% if experiment.end_date %}
+                        <p><strong>Ended:</strong> {{ experiment.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% endif %}
+                    {% if experiment.vessel %}
+                        <div class="mt-3">
+                            <h6>Vessel Status: <span class="badge bg-{{ 'success' if experiment.vessel.status == 'OK' else 'warning' if experiment.vessel.status in ['Compromised', 'Breached'] else 'danger' }}">
+                                {{ experiment.vessel.status }}
+                            </span></h6>
+                            {% if experiment.culture_vessel %}
+                                <form method="POST" class="mt-2">
+                                    {{ form.hidden_tag() }}
+                                    <input type="hidden" name="update_vessel_status" value="1">
+                                    <select name="vessel_status" class="form-select form-select-sm mb-2">
+                                        {% set status_options = ['OK', 'Compromised', 'Contaminated', 'Breached', 'Non-viable', 'Decommissioned', 'Defunct'] %}
+                                        {% for status in status_options %}
+                                            <option value="{{ status }}" {% if experiment.culture_vessel.status == status %}selected{% endif %}>{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Update Status</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <p><strong>Medium:</strong> {{ experiment.medium.type }}</p>
+                    <p><strong>Culture Vessel:</strong> 
+                        {% if experiment.vessel_id %}
+                            {{ experiment.culture_vessel.label }}
+                            <span class="badge bg-{{ 'success' if experiment.culture_vessel.status in ['OK', 'In Use']
+                                                else 'warning' if experiment.culture_vessel.status in ['Compromised', 'Breached'] 
+                                                else 'danger' }}">
+                                {{ experiment.culture_vessel.status }}
+                            </span>
+                        {% else %}
+                            No vessel assigned
+                        {% endif %}
+                    </p>
+                    <p><strong>Substrate:</strong> {{ experiment.substrate_composition }}</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Inoculation Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Method:</strong> {{ experiment.inoculation_method }}</p>
+                    <p><strong>Source:</strong> {{ experiment.inoculation_source_type }}</p>
+                    {% if experiment.inoculation_date %}
+                        <p><strong>Date:</strong> {{ experiment.inoculation_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% endif %}
+                    {% if experiment.geographic_origin %}
+                        <p><strong>Origin:</strong> {{ experiment.geographic_origin }}</p>
+                    {% endif %}
+                    {% if experiment.supplier_info %}
+                        <p><strong>Supplier:</strong> {{ experiment.supplier_info }}</p>
+                    {% endif %}
+                    {% if experiment.strain_info %}
+                        <p><strong>Strain:</strong> {{ experiment.strain_info }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Environmental Conditions</h5>
+                </div>
+                <div class="card-body">
+                    {% if experiment.temperature %}
+                        <p><strong>Temperature:</strong> {{ experiment.temperature }}°C</p>
+                    {% endif %}
+                    {% if experiment.humidity %}
+                        <p><strong>Humidity:</strong> {{ experiment.humidity }}%</p>
+                    {% endif %}
+                    {% if experiment.light_exposure %}
+                        <p><strong>Light:</strong> {{ experiment.light_exposure }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Experiment Timeline</h5>
+                </div>
+                <div class="card-body">
+                    {% if entries %}
+                        <div class="timeline">
+                            {% for entry in entries %}
+                                <div class="timeline-item mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <h6>{{ entry.entry_date.strftime('%Y-%m-%d %H:%M') }}</h6>
+                                        <span class="badge bg-info">{{ entry.entry_type }}</span>
+                                    </div>
+                                    <p>{{ entry.content }}</p>
+                                    {% if entry.images %}
+                                        <div class="entry-images">
+                                            {% for image in entry.images %}
+                                                <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" 
+                                                     class="img-thumbnail" alt="Entry image">
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No entries yet. Add your first entry to start tracking this experiment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

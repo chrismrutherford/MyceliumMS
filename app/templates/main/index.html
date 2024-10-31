@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Welcome {{ current_user.username }}!</h1>
+    
+    <div class="dashboard">
+        <h2>Dashboard</h2>
+        
+        <div class="quick-stats">
+            <div class="stat-box">
+                <h3>Active Experiments</h3>
+                <p>{{ active_experiments }}</p>
+                <a href="{{ url_for('experiments.list_experiments') }}" class="btn">View Experiments</a>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ url_for('experiments.list_experiments') }}" class="btn btn-primary">View Experiments</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
